@@ -22,6 +22,20 @@ const skill = skillBuilder.create();
 const adapter = new ExpressAdapter(skill, true, true);
 
 const app = express();
+// One line per request, including ones the adapter rejects (bad signature or
+// timestamp → 400), so failed Alexa calls are visible in the journal.
+app.use((req, res, next) => {
+  const started = Date.now();
+  const send = res.send.bind(res);
+  let body;
+  res.send = (b) => { body = b; return send(b); };
+  res.on('finish', () => {
+    const detail = res.statusCode >= 400 && body ? ` ${String(body).slice(0, 200)}` : '';
+    console.log(`${req.method} ${req.originalUrl} -> ${res.statusCode} ${Date.now() - started}ms`
+      + ` ua="${req.get('user-agent') || ''}" sig=${req.get('signature-256') ? '256' : req.get('signature') ? '1' : 'none'}${detail}`);
+  });
+  next();
+});
 app.get('/health', (req, res) => res.json({ ok: true }));
 app.post(SKILL_PATH, adapter.getRequestHandlers());
 

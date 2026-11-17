@@ -50,3 +50,19 @@ Im Tunnel einen Public Hostname anlegen, z. B. `alexa.example.com` →
 Wie im englischen README: Eigene Befehle (Spulen, Kapitel) brauchen den
 Aufrufnamen; Alexas globale Mediensteuerung fängt „vorspulen“ ohne ihn ab.
 Fallback: „Alexa, pause“ → „Alexa, öffne mein hörbuch“ → „zehn Minuten vor“.
+
+## Fallstricke (Cloudflare Tunnel)
+
+- **Bot Fight Mode muss aus sein.** Alexa ruft aus AWS mit `Apache-HttpClient (Java)`
+  an; Bot Fight Mode beantwortet das mit einer Managed Challenge (403). In der
+  Alexa-Konsole erscheint dann nur „Skill endpoint returned an invalid response“,
+  beim Skill kommt nichts an. Im Free-Plan lässt sich Bot Fight Mode nicht per
+  WAF-Regel für einen Host ausnehmen – nur zonenweit abschalten.
+- **Zertifikat:** Cloudflare Universal SSL ist ein Wildcard-Zertifikat → in der
+  Endpoint-Einstellung „sub-domain of a domain that has a wildcard certificate“ wählen.
+- **Hosting „Provision your own“** wählen. Ein Alexa-hosted Skill (Tab „Code“)
+  leitet Anfragen an Amazons Lambda statt an den eigenen Endpunkt.
+- **Kein IPv6 im Container?** Die Unit setzt `--dns-result-order=ipv4first`, sonst
+  laufen Anfragen an AAAA-Adressen ins Timeout.
+- Diagnose: `journalctl -u abs-alexa -f` zeigt jede Anfrage mit Status; im
+  Test-Tab „Manual JSON“ zeigt Amazon den konkreten Fehler.
