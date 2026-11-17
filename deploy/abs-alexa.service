@@ -1,0 +1,20 @@
+[Unit]
+Description=Audiobookshelf Alexa skill (self-hosted endpoint)
+After=network-online.target audiobookshelf.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/abs-alexa/lambda
+EnvironmentFile=/etc/abs-alexa.env
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=5
+User=abs-alexa
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target

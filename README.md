@@ -228,3 +228,10 @@ is project configuration and should be committed.
       cannot be reconstructed from the Alexa stream token and Audiobookshelf
 - [ ] Add other intents, such as:
   - [ ] "Start the book over"
+
+## Deutsch / self-hosted
+
+The skill also ships a `de-DE` interaction model and German speech (picked
+from the request locale), plus a self-hosted HTTPS endpoint (`lambda/server.js`,
+signature-verified via `ask-sdk-express-adapter`). See
+[deploy/SELF-HOSTING.de.md](deploy/SELF-HOSTING.de.md).

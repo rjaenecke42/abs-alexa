@@ -1,0 +1,278 @@
+{
+  "interactionModel": {
+    "dialog": {
+      "intents": [
+        {
+          "slots": [
+            {
+              "name": "time",
+              "elicitationRequired": true,
+              "type": "AMAZON.DURATION",
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.454140924019.1491668277531"
+              }
+            }
+          ],
+          "name": "GoBackXTimeIntent",
+          "confirmationRequired": false,
+          "prompts": {}
+        },
+        {
+          "slots": [
+            {
+              "name": "time",
+              "elicitationRequired": true,
+              "type": "AMAZON.DURATION",
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.1425758106737.86337652976"
+              }
+            }
+          ],
+          "name": "GoForwardXTimeIntent",
+          "confirmationRequired": false,
+          "prompts": {}
+        },
+        {
+          "slots": [
+            {
+              "name": "title",
+              "elicitationRequired": false,
+              "type": "AMAZON.Book",
+              "confirmationRequired": false,
+              "prompts": {}
+            },
+            {
+              "name": "author",
+              "elicitationRequired": false,
+              "type": "AMAZON.Author",
+              "confirmationRequired": false,
+              "prompts": {}
+            }
+          ],
+          "name": "PlayBookIntent",
+          "confirmationRequired": false,
+          "prompts": {}
+        },
+        {
+          "slots": [
+            {
+              "name": "chapterNumber",
+              "elicitationRequired": true,
+              "type": "AMAZON.NUMBER",
+              "confirmationRequired": false,
+              "prompts": {
+                "elicitation": "Elicit.Slot.464967230894.1040650485539"
+              }
+            }
+          ],
+          "name": "GoToChapterX",
+          "confirmationRequired": false,
+          "prompts": {}
+        }
+      ],
+      "delegationStrategy": "ALWAYS"
+    },
+    "languageModel": {
+      "intents": [
+        {
+          "name": "AMAZON.CancelIntent",
+          "samples": [
+            "beenden",
+            "schluss"
+          ]
+        },
+        {
+          "name": "AMAZON.HelpIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.StopIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.NavigateHomeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.FallbackIntent",
+          "samples": []
+        },
+        {
+          "slots": [],
+          "name": "PlayLastIntent",
+          "samples": [
+            "spiele das letzte hörbuch",
+            "spiele das letzte buch",
+            "spiel das letzte hörbuch",
+            "spiel das letzte buch",
+            "mach weiter wo ich aufgehört habe",
+            "weiterhören",
+            "setze mein hörbuch fort",
+            "setze das hörbuch fort",
+            "spiele mein hörbuch weiter",
+            "spiel weiter"
+          ]
+        },
+        {
+          "slots": [],
+          "name": "RecentBooksIntent",
+          "samples": [
+            "was höre ich gerade",
+            "was habe ich zuletzt gehört",
+            "was habe ich in letzter zeit gehört",
+            "welche hörbücher habe ich zuletzt gehört",
+            "was sind meine letzten hörbücher",
+            "liste meine letzten hörbücher auf"
+          ]
+        },
+        {
+          "name": "AMAZON.PauseIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.ResumeIntent",
+          "samples": []
+        },
+        {
+          "name": "AMAZON.PreviousIntent",
+          "samples": []
+        },
+        {
+          "slots": [
+            {
+              "name": "time",
+              "type": "AMAZON.DURATION",
+              "samples": [
+                "{time} zurück",
+                "spule {time} zurück",
+                "gehe {time} zurück"
+              ]
+            }
+          ],
+          "name": "GoBackXTimeIntent",
+          "samples": [
+            "{time} zurück",
+            "spule {time} zurück",
+            "spul {time} zurück",
+            "gehe {time} zurück",
+            "geh {time} zurück",
+            "springe {time} zurück",
+            "spring {time} zurück",
+            "zurück um {time}"
+          ]
+        },
+        {
+          "slots": [
+            {
+              "name": "time",
+              "type": "AMAZON.DURATION",
+              "samples": [
+                "{time} vor",
+                "spule {time} vor",
+                "springe {time} vor"
+              ]
+            }
+          ],
+          "name": "GoForwardXTimeIntent",
+          "samples": [
+            "{time} vor",
+            "{time} vorwärts",
+            "spule {time} vor",
+            "spul {time} vor",
+            "springe {time} vor",
+            "spring {time} vor",
+            "gehe {time} vor",
+            "geh {time} vor",
+            "überspringe {time}",
+            "vorspulen um {time}"
+          ]
+        },
+        {
+          "slots": [
+            {
+              "name": "title",
+              "type": "AMAZON.Book"
+            },
+            {
+              "name": "author",
+              "type": "AMAZON.Author"
+            }
+          ],
+          "name": "PlayBookIntent",
+          "samples": [
+            "spiele {title}",
+            "spiel {title}",
+            "spiele {title} von {author}",
+            "spiel {title} von {author}",
+            "spiele das hörbuch {title}",
+            "spiele das hörbuch {title} von {author}",
+            "spiele das buch {title}",
+            "spiele das buch {title} von {author}",
+            "starte {title}",
+            "starte {title} von {author}",
+            "lies {title} vor",
+            "lies {title} von {author} vor",
+            "ich möchte {title} hören",
+            "ich möchte {title} von {author} hören"
+          ]
+        },
+        {
+          "slots": [
+            {
+              "name": "chapterNumber",
+              "type": "AMAZON.NUMBER"
+            }
+          ],
+          "name": "GoToChapterX",
+          "samples": [
+            "gehe zu kapitel {chapterNumber}",
+            "geh zu kapitel {chapterNumber}",
+            "springe zu kapitel {chapterNumber}",
+            "spring zu kapitel {chapterNumber}",
+            "springe zum kapitel {chapterNumber}",
+            "kapitel {chapterNumber}",
+            "spiele kapitel {chapterNumber}",
+            "zurück zu kapitel {chapterNumber}"
+          ]
+        },
+        {
+          "name": "AMAZON.NextIntent",
+          "samples": []
+        }
+      ],
+      "types": [],
+      "invocationName": "mein hörbuch"
+    },
+    "prompts": [
+      {
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Wie weit soll ich zurückspulen? Sag zum Beispiel fünfzehn Sekunden."
+          }
+        ],
+        "id": "Elicit.Slot.454140924019.1491668277531"
+      },
+      {
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Wie weit soll ich vorspulen? Sag zum Beispiel fünf Minuten."
+          }
+        ],
+        "id": "Elicit.Slot.1425758106737.86337652976"
+      },
+      {
+        "variations": [
+          {
+            "type": "PlainText",
+            "value": "Zu welchem Kapitel? Sag zum Beispiel Kapitel zwölf."
+          }
+        ],
+        "id": "Elicit.Slot.464967230894.1040650485539"
+      }
+    ]
+  }
+}

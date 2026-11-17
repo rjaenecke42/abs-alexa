@@ -14,6 +14,7 @@ const { getRecentLibraryItems, getLastPlayedLibraryItem, getItemById, startUserP
 const { createPlaybackToken, createPlaybackInstanceToken,
   parsePlaybackToken } = require('./lib/playback-token');
 const { formatSpokenList } = require('./lib/speech');
+const { t } = require('./lib/i18n');
 //const { SsmlUtils } = require('ask-sdk-core');
 
 let localSessionAttributes = {
@@ -167,7 +168,7 @@ function recoverPlaybackState(handlerInput, { allowSessionReplacement = true } =
 
 function noActivePlaybackResponse(handlerInput) {
   return handlerInput.responseBuilder
-    .speak(sanitizeForSSML('Please ask me to play an audiobook first.'))
+    .speak(sanitizeForSSML(t(handlerInput, 'noActivePlayback')))
     .withShouldEndSession(true)
     .getResponse();
 }
@@ -408,7 +409,7 @@ const LaunchRequestHandler = {
     return Alexa.getRequestType(handlerInput.requestEnvelope) === 'LaunchRequest';
   },
   handle(handlerInput) {
-    const speakOutput = 'Welcome to Audiobookshelf, you can say "play audiobook" to start listening.';
+    const speakOutput = t(handlerInput, 'welcome');
 
     console.log(" ~~~ LOGGED AT END OF LaunchRequestHandler ")
     return handlerInput.responseBuilder
@@ -428,7 +429,7 @@ const RecentBooksIntentHandler = {
 
     if (!recentBooks.length) {
       return handlerInput.responseBuilder
-        .speak(sanitizeForSSML("You haven't listened to any audiobooks recently."))
+        .speak(sanitizeForSSML(t(handlerInput, 'noRecentBooks')))
         .withShouldEndSession(true)
         .getResponse();
     }
@@ -436,11 +437,11 @@ const RecentBooksIntentHandler = {
     const descriptions = recentBooks.map((book) => {
       const metadata = book.media.metadata;
       return metadata.authorName
-        ? `${metadata.title} by ${metadata.authorName}`
+        ? t(handlerInput, 'bookByAuthor', { title: metadata.title, author: metadata.authorName })
         : metadata.title;
     });
-    const spokenList = formatSpokenList(descriptions);
-    const speakOutput = `You've most recently listened to: ${spokenList}.`;
+    const spokenList = formatSpokenList(descriptions, t(handlerInput, 'listAnd'));
+    const speakOutput = t(handlerInput, 'recentBooks', { list: spokenList });
 
     return handlerInput.responseBuilder
       .speak(sanitizeForSSML(speakOutput))
@@ -577,7 +578,7 @@ const PlayAudioIntentHandler = {
         //speakOutput = 'Resuming...';
       }
       else {
-        speakOutput = 'Playing ' + bookTitle + " by " + author;
+        speakOutput = t(handlerInput, author ? 'playing' : 'playingTitle', { title: bookTitle, author });
       }
       console.log(`Playing Audiobookshelf item ${userPlaySession.libraryItemId}, track ${currentTrackIndex}`)
 
@@ -643,7 +644,7 @@ const PlayBookIntentHandler = {
 
     // require a book title (could later implement playing by author I suppose, maybe in another intent)
     if (!bookTitle) {
-      let speakOutput = 'I did not understand the request. For example, try saying "Play audiobook title by author".';
+      let speakOutput = t(handlerInput, 'didNotUnderstand');
       console.log("Book and/or author slot undefined")
       return handlerInput.responseBuilder
         .speak(speakOutput)
@@ -865,7 +866,7 @@ const PlayBookIntentHandler = {
     }
     else {
       console.log("Could not find a playable book (" + rawTitle + " by " + rawAuthor + ")")
-      let speakOutput = "Could not find a playable book matching: " + rawTitle + " by " + rawAuthor + ". Please try again."
+      let speakOutput = t(handlerInput, rawAuthor ? 'notFound' : 'notFoundTitle', { title: rawTitle, author: rawAuthor })
       return handlerInput.responseBuilder
         .speak(sanitizeForSSML(speakOutput))
         .reprompt(sanitizeForSSML(speakOutput))
@@ -945,7 +946,8 @@ const PlayBookIntentHandler = {
     )
     retainPlaybackStateLocally(handlerInput, sessionAttributes)
 
-    let speakOutput = 'Playing ' + userPlaySession.displayTitle + ' by ' + userPlaySession.displayAuthor;
+    let speakOutput = t(handlerInput, userPlaySession.displayAuthor ? 'playing' : 'playingTitle', {
+      title: userPlaySession.displayTitle, author: userPlaySession.displayAuthor });
     console.log(`Playing Audiobookshelf item ${userPlaySession.libraryItemId}, track ${currentTrackIndex}`)
 
     let chapterTitle = getCurrentChapterByBookTime(currentTime, userPlaySession).title
@@ -1119,7 +1121,7 @@ const NextIntentHandler = {
       console.log('NextIntent: already in the final chapter')
       retainPlaybackStateLocally(handlerInput, sessionAttributes)
       return handlerInput.responseBuilder
-        .speak(sanitizeForSSML('This is the last chapter of ' + userPlaySession.displayTitle + '.'))
+        .speak(sanitizeForSSML(t(handlerInput, 'lastChapter', { title: userPlaySession.displayTitle })))
         .withShouldEndSession(true)
         .getResponse()
     }
@@ -1160,7 +1162,7 @@ const GoToChapterXIntentHandler = {
     if (chapters.length === 0) {
       retainPlaybackStateLocally(handlerInput, sessionAttributes)
       return handlerInput.responseBuilder
-        .speak(sanitizeForSSML('This audiobook does not include chapter information.'))
+        .speak(sanitizeForSSML(t(handlerInput, 'noChapters')))
         .withShouldEndSession(true)
         .getResponse()
     }
@@ -1169,7 +1171,7 @@ const GoToChapterXIntentHandler = {
       retainPlaybackStateLocally(handlerInput, sessionAttributes)
       return handlerInput.responseBuilder
         .speak(sanitizeForSSML(
-          `Please choose a chapter between 1 and ${chapters.length}.`))
+          t(handlerInput, 'chapterRange', { count: chapters.length })))
         .withShouldEndSession(true)
         .getResponse()
     }
@@ -1186,7 +1188,7 @@ const GoToChapterXIntentHandler = {
 
     console.log(`GoToChapterX: chapter ${chapterNumber} starts at ${newBookTime} seconds`)
     return handlerInput.responseBuilder
-      .speak(sanitizeForSSML(`Going to chapter ${chapterNumber}.`))
+      .speak(sanitizeForSSML(t(handlerInput, 'goingToChapter', { number: chapterNumber })))
       .addAudioPlayerPlayDirective(
         'REPLACE_ALL',
         playback.playUrl,
@@ -1297,7 +1299,7 @@ const UnsupportedAudioIntentHandler = {
       );
   },
   async handle(handlerInput) {
-    const speakOutput = 'Sorry, I can\'t support that yet.';
+    const speakOutput = t(handlerInput, 'unsupported');
 
     return handlerInput.responseBuilder
       .speak(sanitizeForSSML(speakOutput))
@@ -1311,7 +1313,7 @@ const HelpIntentHandler = {
       && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.HelpIntent';
   },
   handle(handlerInput) {
-    const speakOutput = 'You can say "play audio" to start playing your book! How can I help?';
+    const speakOutput = t(handlerInput, 'help');
 
     return handlerInput.responseBuilder
       .speak(speakOutput)
@@ -1331,7 +1333,7 @@ const CancelAndStopIntentHandler = {
         || Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.StopIntent');
   },
   handle(handlerInput) {
-    const speakOutput = 'Goodbye!';
+    const speakOutput = t(handlerInput, 'goodbye');
     let state = null
     let closed = false
 
@@ -1854,7 +1856,7 @@ const FallbackIntentHandler = {
       && Alexa.getIntentName(handlerInput.requestEnvelope) === 'AMAZON.FallbackIntent';
   },
   handle(handlerInput) {
-    const speakOutput = 'Sorry, I don\'t know about that. Please try again.';
+    const speakOutput = t(handlerInput, 'fallback');
 
     return handlerInput.responseBuilder
       .speak(speakOutput)
@@ -1933,7 +1935,7 @@ const IntentReflectorHandler = {
   handle(handlerInput) {
     const intentName = Alexa.getIntentName(handlerInput.requestEnvelope);
     console.log(`Unhandled intent reached IntentReflectorHandler: ${intentName}`);
-    const speakOutput = "Sorry, I can't do that yet.";
+    const speakOutput = t(handlerInput, 'reflector');
 
     return handlerInput.responseBuilder
       .speak(speakOutput)
@@ -1961,7 +1963,7 @@ const ErrorHandler = {
       return handlerInput.responseBuilder.getResponse();
     }
 
-    const speakOutput = 'Sorry, I had trouble doing what you asked. Please try again.';
+    const speakOutput = t(handlerInput, 'error');
     return handlerInput.responseBuilder
       .speak(speakOutput)
       .reprompt(speakOutput)
@@ -1976,7 +1978,9 @@ const ErrorHandler = {
  * payloads to the handlers above. Make sure any new handlers or interceptors you've
  * defined are included below. The order matters - they're processed top to bottom
  * */
-exports.handler = Alexa.SkillBuilders.custom()
+// The builder is shared: Lambda/Alexa-hosted uses exports.handler, the
+// self-hosted HTTPS server (server.js) calls skillBuilder.create().
+const skillBuilder = Alexa.SkillBuilders.custom()
   .addRequestHandlers(
     LaunchRequestHandler,
     RecentBooksIntentHandler,
@@ -1999,5 +2003,7 @@ exports.handler = Alexa.SkillBuilders.custom()
     IntentReflectorHandler)
   .addErrorHandlers(
     ErrorHandler)
-  .withCustomUserAgent('AlexaSkill')
-  .lambda();
+  .withCustomUserAgent('AlexaSkill');
+
+exports.skillBuilder = skillBuilder;
+exports.handler = skillBuilder.lambda();

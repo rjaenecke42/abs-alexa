@@ -57,6 +57,24 @@
           ],
           "name": "Audiobookshelf",
           "summary": "Listen to audiobooks from your own Audiobookshelf server. Resume where you left off, jump between chapters, and keep progress in sync."
+        },
+        "de-DE": {
+          "description": "Hörbücher von deinem eigenen Audiobookshelf-Server auf deinen Echo-Geräten abspielen.\n\nFunktionen:\n- Das zuletzt gehörte Hörbuch genau dort fortsetzen, wo du aufgehört hast\n- Ein Hörbuch nach Titel und Autor starten (unscharfe Suche in deiner Bibliothek)\n- Kapitel vor und zurück, direkt zu einem Kapitel springen\n- Um eine Zeitspanne vor- oder zurückspulen, z. B. „zwei Minuten zurück“\n- Der Hörfortschritt wird mit Audiobookshelf synchronisiert\n\nVoraussetzung: ein öffentlich erreichbarer Audiobookshelf-Server und ein API-Schlüssel dafür.",
+          "examplePhrases": [
+            "Alexa, öffne mein hörbuch",
+            "Alexa, sage mein hörbuch, spiele das letzte hörbuch",
+            "Alexa, sage mein hörbuch, gehe zu kapitel drei"
+          ],
+          "keywords": [
+            "hörbuch",
+            "hörbücher",
+            "audiobookshelf",
+            "abs",
+            "selfhosted",
+            "homelab"
+          ],
+          "name": "Audiobookshelf",
+          "summary": "Hörbücher vom eigenen Audiobookshelf-Server hören, Fortschritt bleibt synchron."
         }
       },
       "testingInstructions": "This skill is a client for the user's own self-hosted Audiobookshelf server (https://www.audiobookshelf.org). It has no content or accounts of its own, and it cannot function without a server URL and API key that the operator supplies at deploy time.\n\nBecause the backing server is private to each operator, this skill is intended for personal use rather than public distribution, and there is no shared test account to provide.\n\nTo exercise it against your own instance:\n1. Set ABS_API_KEY and SERVER_URL for the skill's Lambda (or copy lambda/config.example.js to lambda/config.js and fill it in).\n2. Ensure the Audiobookshelf library type is set to audiobooks; other library types are not searched.\n3. Open the skill and say \"play\" to resume the most recently played book.\n4. Say \"next\" or \"previous\" to move between chapters.\n5. Say \"go back two minutes\" to seek within the current chapter.\n6. Say \"play\" followed by a title in the library to start a specific book."
