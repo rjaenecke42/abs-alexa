@@ -11,6 +11,7 @@ require.cache[settingsPath] = {
   exports: {
     ABS_API_KEY: 'TEST_API_KEY',
     SERVER_URL: 'https://abs.example',
+    API_URL: 'https://abs.example',
     baseheaders: {},
   },
 };

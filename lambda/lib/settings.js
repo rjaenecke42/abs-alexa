@@ -13,6 +13,10 @@ const cfg = (key, fallback) =>
   process.env[key] !== undefined ? process.env[key] : (fileConfig[key] !== undefined ? fileConfig[key] : fallback);
 const ABS_API_KEY = cfg('ABS_API_KEY');
 const SERVER_URL = cfg('SERVER_URL');
+// Optional internal URL for API calls (e.g. http://127.0.0.1:13378 when the
+// skill runs next to Audiobookshelf). Stream and cover URLs always use
+// SERVER_URL, because the Echo device fetches those itself.
+const API_URL = cfg('ABS_INTERNAL_URL', SERVER_URL);
 const USER_AGENT = cfg('USER_AGENT', 'AlexaSkill');
 const BACKGROUND_URL = cfg('BACKGROUND_URL');
 const CFAccessClientId = cfg('CFAccessClientId');
@@ -36,5 +40,5 @@ function resolveBackgroundUrl(coverUrl) {
   return BACKGROUND_URL || coverUrl;
 }
 
-module.exports = { ABS_API_KEY, SERVER_URL, USER_AGENT, BACKGROUND_URL,
+module.exports = { ABS_API_KEY, SERVER_URL, API_URL, USER_AGENT, BACKGROUND_URL,
   CFAccessClientId, CFAccessClientSecret, baseheaders, resolveBackgroundUrl };

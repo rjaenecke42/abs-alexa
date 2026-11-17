@@ -3,12 +3,12 @@
 // arguments and return parsed responses.
 
 const request = require('sync-request');
-const { SERVER_URL, baseheaders } = require('./settings');
+const { SERVER_URL, API_URL, baseheaders } = require('./settings');
 
 function getRecentLibraryItems(limit = 3) {
   try {
     const requestedLimit = Number.isInteger(limit) && limit > 0 ? limit : 3;
-    let res = request('GET', `${SERVER_URL}/api/me/items-in-progress?limit=${requestedLimit}`, { headers: baseheaders });
+    let res = request('GET', `${API_URL}/api/me/items-in-progress?limit=${requestedLimit}`, { headers: baseheaders });
     if (res.statusCode !== 200) {
       throw new Error(`Failed to fetch recent library items: HTTP ${res.statusCode}`);
     }
@@ -28,7 +28,7 @@ function getLastPlayedLibraryItem() {
 }
 
 function getItemById(id, options = {}) {
-  const baseUrl = SERVER_URL + '/api/items/'; // Replace with your actual base URL
+  const baseUrl = API_URL + '/api/items/'; // Replace with your actual base URL
   let url = `${baseUrl}${id}`;
 
   const queryParams = [];
@@ -88,7 +88,7 @@ function startUserPlaySession(libraryID, handlerInput) {
 
 
 
-    res = request('POST', SERVER_URL + `/api/items/${libraryID}/play`, { headers: baseheaders, json: bodyParameters });
+    res = request('POST', API_URL + `/api/items/${libraryID}/play`, { headers: baseheaders, json: bodyParameters });
     if (res.statusCode !== 200) {
       throw new Error(`Failed to start play session: HTTP ${res.statusCode}`);
     }
@@ -114,7 +114,7 @@ function httpError(message, statusCode) {
 function getExistingUserPlaySession(sessionID) {
   try {
     console.log("getExistingUserPlaySession")
-    const res = request('GET', SERVER_URL + `/api/session/${encodeURIComponent(sessionID)}`, { headers: baseheaders });
+    const res = request('GET', API_URL + `/api/session/${encodeURIComponent(sessionID)}`, { headers: baseheaders });
     if (res.statusCode !== 200) {
       throw new Error(`Failed to fetch play session: HTTP ${res.statusCode}`);
     }
@@ -133,8 +133,8 @@ function getExistingUserPlaySession(sessionID) {
 function updateMediaProgress(libraryItemId, episodeId, data) {
   if (!libraryItemId) throw new Error('Cannot update media progress without a library item id');
   const url = episodeId
-    ? `${SERVER_URL}/api/me/progress/${libraryItemId}/${episodeId}`
-    : `${SERVER_URL}/api/me/progress/${libraryItemId}`;
+    ? `${API_URL}/api/me/progress/${libraryItemId}/${episodeId}`
+    : `${API_URL}/api/me/progress/${libraryItemId}`;
 
   // baseheaders carries the bearer token; without it ABS answers 401.
   const res = request('PATCH', url, { headers: baseheaders, json: data });
@@ -154,7 +154,7 @@ function updateUserPlaySession(playSession, currentBookTime, timeListened) {
   };
   console.log("Update ABS play session for book: " + playSession.mediaMetadata.title
     + ` (currentTime=${payload.currentTime}, timeListened=${payload.timeListened})`);
-  const res = request('POST', SERVER_URL + `/api/session/${playSession.id}/sync`, {
+  const res = request('POST', API_URL + `/api/session/${playSession.id}/sync`, {
     headers: { 'Content-Type': 'application/json', ...baseheaders },
     json: payload,
   });
@@ -173,7 +173,7 @@ function closeUserPlaySession(userPlaySession, currentBookTime, timeListened) {
     timeListened: Math.max(0, Number(timeListened) || 0),
     duration: userPlaySession.duration,
   };
-  const apiUrl = SERVER_URL + `/api/session/${userPlaySession.id}/close`;
+  const apiUrl = API_URL + `/api/session/${userPlaySession.id}/close`;
   console.log("Close ABS play session for book: " + userPlaySession.mediaMetadata.title
     + ` (currentTime=${payload.currentTime}, timeListened=${payload.timeListened})`);
   const res = request('POST', apiUrl, {
@@ -193,7 +193,7 @@ function getCoverUrl(libraryItemId) {
 
 function getLibraryFilterData(libraryID) {
   try {
-    let res = request('GET', `${SERVER_URL}/api/libraries/${libraryID}/filterdata`, { headers: baseheaders });
+    let res = request('GET', `${API_URL}/api/libraries/${libraryID}/filterdata`, { headers: baseheaders });
     let data = JSON.parse(res.getBody('utf8'));
     return data;
   } catch (error) {
@@ -204,7 +204,7 @@ function getLibraryFilterData(libraryID) {
 
 function getAllLibraries() {
   try {
-    let res = request('GET', `${SERVER_URL}/api/libraries`, { headers: baseheaders });
+    let res = request('GET', `${API_URL}/api/libraries`, { headers: baseheaders });
     let data = JSON.parse(res.getBody('utf8'));
     return data.libraries;
   } catch (error) {
@@ -252,7 +252,7 @@ function getLibraryItems(options = {}) {
     include = ''
   } = options;
 
-  const baseUrl = `${SERVER_URL}/api/libraries/${libraryID}/items`;
+  const baseUrl = `${API_URL}/api/libraries/${libraryID}/items`;
 
   const queryParams = [];
 
@@ -302,7 +302,7 @@ function getLibraryItems(options = {}) {
 
 function getAuthor(authorID) {
   try {
-    let res = request('GET', `${SERVER_URL}/api/authors/${authorID}?include=items`, { headers: baseheaders });
+    let res = request('GET', `${API_URL}/api/authors/${authorID}?include=items`, { headers: baseheaders });
     let data = JSON.parse(res.getBody('utf8'));
     return data;
   } catch (error) {
@@ -312,7 +312,7 @@ function getAuthor(authorID) {
 }
 
 function buildLibrarySearchUrl(query, libraryID) {
-  return `${SERVER_URL}/api/libraries/${encodeURIComponent(libraryID)}/search?q=${encodeURIComponent(query)}`;
+  return `${API_URL}/api/libraries/${encodeURIComponent(libraryID)}/search?q=${encodeURIComponent(query)}`;
 }
 
 function searchFor(query, libraryID) {
