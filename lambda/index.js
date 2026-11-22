@@ -517,7 +517,28 @@ const PlayAudioIntentHandler = {
       }
       else {
         currentTime = existingSession.currentTime
-
+        // Another client (ABS app on TV/phone) may have moved the book on since
+        // this Alexa session last synced. Prefer ABS's media progress when it is
+        // newer than our session and points somewhere else.
+        const resumeItemId = userPlaySession.libraryItemId || existingSession.libraryItemId
+        if (resumeItemId) try {
+          const item = getItemById(resumeItemId, { include: ['progress'], expanded: 1 })
+          const progress = item?.userMediaProgress
+          const serverTime = Number(progress?.currentTime)
+          const serverUpdated = Number(progress?.lastUpdate) || 0
+          const sessionUpdated = Number(existingSession.updatedAt) || 0
+          if (Number.isFinite(serverTime) && serverUpdated > sessionUpdated + 2000
+            && Math.abs(serverTime - Number(currentTime)) > 5
+            && serverTime < Number(userPlaySession.duration)) {
+            console.log(`Resume: ABS progress is newer (${serverTime}s @ ${new Date(serverUpdated).toISOString()}) `
+              + `than this Alexa session (${currentTime}s @ ${new Date(sessionUpdated).toISOString()}); using ABS position`)
+            currentTime = serverTime
+            userPlaySession.currentTime = serverTime
+            userPlaySession.updatedAt = Date.now()
+          }
+        } catch (error) {
+          console.log(`Resume: could not compare with ABS progress (${error.message}); keeping session position`)
+        }
       }
       sessionAttributes.userPlaySession = userPlaySession
 
